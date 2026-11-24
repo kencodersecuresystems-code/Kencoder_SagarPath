@@ -1,0 +1,101 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INMAP",
+        "name": "Machilipatnam Port",
+        "state": "Andhra Pradesh",
+        "type": "seaport",
+        "modes": ["sea", "road", "rail"],
+        "corridor": "East Coast / NW-4"
+      },
+      "geometry": { "type": "Point", "coordinates": [81.2015, 16.1436] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INVTZ",
+        "name": "Visakhapatnam Port",
+        "state": "Andhra Pradesh",
+        "type": "seaport",
+        "modes": ["sea", "road", "rail", "air"],
+        "corridor": "East Coast"
+      },
+      "geometry": { "type": "Point", "coordinates": [83.2878, 17.6868] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INKAK",
+        "name": "Kakinada Deep Water Port",
+        "state": "Andhra Pradesh",
+        "type": "seaport",
+        "modes": ["sea", "waterway", "road", "rail"],
+        "corridor": "East Coast / NW-4"
+      },
+      "geometry": { "type": "Point", "coordinates": [82.2683, 16.9535] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INKRI",
+        "name": "Krishnapatnam Port",
+        "state": "Andhra Pradesh",
+        "type": "seaport",
+        "modes": ["sea", "road", "rail"],
+        "corridor": "East Coast"
+      },
+      "geometry": { "type": "Point", "coordinates": [80.1235, 14.2489] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INMAA",
+        "name": "Chennai Port",
+        "state": "Tamil Nadu",
+        "type": "seaport",
+        "modes": ["sea", "road", "rail", "air"],
+        "corridor": "East Coast"
+      },
+      "geometry": { "type": "Point", "coordinates": [80.2931, 13.0844] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INPRT",
+        "name": "Paradip Port",
+        "state": "Odisha",
+        "type": "seaport",
+        "modes": ["sea", "waterway", "road", "rail"],
+        "corridor": "East Coast / NW-5"
+      },
+      "geometry": { "type": "Point", "coordinates": [86.6705, 20.2644] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INHAL",
+        "name": "Haldia Dock Complex",
+        "state": "West Bengal",
+        "type": "seaport",
+        "modes": ["sea", "waterway", "road", "rail"],
+        "corridor": "East Coast / NW-1"
+      },
+      "geometry": { "type": "Point", "coordinates": [88.0815, 22.0257] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "INPAT-NW1",
+        "name": "Gaighat Terminal (Patna - NW-1)",
+        "state": "Bihar",
+        "type": "waterway_terminal",
+        "modes": ["waterway", "road", "rail"],
+        "corridor": "NW-1 (Ganga)"
+      },
+      "geometry": { "type": "Point", "coordinates": [85.2045, 25.6152] }
+    }
+  ]
+}
