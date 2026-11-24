@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "currency": "INR",
+    "region": "India East Coast & National Waterways (NW-1, NW-4, NW-5)",
+    "notes": "Benchmark rates per Tonne-Km and terminal handling charges for pre-shipment multimodal comparison."
+  },
+  "modes": {
+    "road": {
+      "label": "All-Road Heavy Truck (NH Corridor)",
+      "cost_per_tkm": 3.80,
+      "avg_speed_kmh": 42.0,
+      "circuity": 1.25,
+      "handling_inr_per_t": 150,
+      "dwell_hours": 0.0,
+      "co2_g_per_tkm": 62.0
+    },
+    "rail": {
+      "label": "Indian Railways (FOIS Freight Corridor)",
+      "cost_per_tkm": 1.65,
+      "avg_speed_kmh": 26.0,
+      "circuity": 1.20,
+      "handling_inr_per_t": 350,
+      "dwell_hours": 6.0,
+      "co2_g_per_tkm": 22.0
+    },
+    "coastal_sea": {
+      "label": "Coastal Sea Shipping (Port-to-Port)",
+      "cost_per_tkm": 0.95,
+      "avg_speed_kmh": 20.4,
+      "circuity": 1.00,
+      "handling_inr_per_t": 450,
+      "dwell_hours": 8.0,
+      "co2_g_per_tkm": 15.0
+    },
+    "inland_waterway": {
+      "label": "Inland Barge (National Waterway)",
+      "cost_per_tkm": 1.10,
+      "avg_speed_kmh": 12.0,
+      "circuity": 1.00,
+      "handling_inr_per_t": 300,
+      "dwell_hours": 6.0,
+      "co2_g_per_tkm": 18.0
+    }
+  },
+  "commodity_multipliers": {
+    "bulk_agri": 1.0,
+    "minerals_coal": 0.92,
+    "containerized_general": 1.15,
+    "perishable_reefer": 1.45
+  }
+}
