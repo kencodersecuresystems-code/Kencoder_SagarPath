@@ -1,0 +1,48 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "waterway_id": "NW-1",
+        "name": "National Waterway 1 (Ganga-Bhagirathi-Hooghly River System)",
+        "states": ["Bihar", "Jharkhand", "West Bengal"],
+        "min_lad_meters": 2.5,
+        "terminals": ["INPAT-NW1", "INHAL"]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [85.2045, 25.6152],
+          [86.1272, 25.3801],
+          [86.9842, 25.2425],
+          [87.6305, 25.2448],
+          [87.9242, 24.8055],
+          [88.2636, 24.1832],
+          [88.3639, 22.5726],
+          [88.0815, 22.0257]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "waterway_id": "NW-4",
+        "name": "National Waterway 4 (Krishna-Godavari & Buckingham Canal Stretch)",
+        "states": ["Andhra Pradesh", "Tamil Nadu"],
+        "min_lad_meters": 2.0,
+        "terminals": ["INMAP", "INKAK"]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [81.2015, 16.1436],
+          [81.5520, 16.3210],
+          [81.8250, 16.5840],
+          [82.1140, 16.7920],
+          [82.2683, 16.9535]
+        ]
+      }
+    }
+  ]
+}
