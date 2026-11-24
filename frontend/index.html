@@ -8,7 +8,7 @@
   <script src="https://unpkg.com"></script>
   <style>
     body { margin: 0; font-family: system-ui, -apple-system, sans-serif; display: flex; height: 100vh; }
-    #sidebar { width: 380px; padding: 18px; background: #0f172a; color: #f8fafc; overflow-y: auto; box-sizing: border-box; }
+    #sidebar { width: 390px; padding: 18px; background: #0f172a; color: #f8fafc; overflow-y: auto; box-sizing: border-box; }
     #map { flex: 1; }
     h1 { font-size: 1.25rem; margin: 0 0 4px; color: #38bdf8; }
     .sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
@@ -17,11 +17,15 @@
     button { background: #0284c7; border: none; font-weight: 600; margin-top: 14px; cursor: pointer; }
     button:hover { background: #0369a1; }
     .card { background: #1e293b; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 6px; margin-top: 14px; }
+    .card.inland_waterway { border-left-color: #14b8a6; }
+    .card.coastal_sea { border-left-color: #38bdf8; }
     .card.rail { border-left-color: #f59e0b; }
     .card.road { border-left-color: #10b981; }
     .card h3 { margin: 0 0 6px; font-size: 0.95rem; }
     .meta { font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; }
-    .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; background: #0f172a; margin-top: 6px; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; background: #0f172a; margin-top: 6px; color: #e2e8f0; }
+    .legend { display: flex; gap: 12px; font-size: 0.75rem; color: #94a3b8; margin-top: 10px; }
+    .dot { height: 9px; width: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; }
   </style>
 </head>
 <body>
@@ -29,22 +33,30 @@
     <h1>SagarPath Multimodal</h1>
     <div class="sub">Kencoder Secure Systems Pvt Ltd</div>
 
-    <label>Origin Port / Terminal</label>
+    <label>Origin Port / Waterway Terminal</label>
     <select id="origin"></select>
 
-    <label>Destination Port / Terminal</label>
+    <label>Destination Port / Waterway Terminal</label>
     <select id="dest"></select>
 
     <label>Cargo Payload (Metric Tonnes)</label>
     <input id="tonnes" type="number" value="20" min="1" />
 
-    <button onclick="calculateRoutes()">Compare Sea, Rail & Road</button>
+    <button onclick="calculateRoutes()">Compare Waterway, Sea, Rail & Road</button>
+
+    <div class="legend">
+      <span><span class="dot" style="background:#14b8a6"></span>Inland Waterway</span>
+      <span><span class="dot" style="background:#0284c7"></span>Coastal Sea</span>
+    </div>
+
     <div id="results"></div>
   </div>
   <div id="map"></div>
 
   <script>
     const API_BASE = "http://127.0.0.1:8000";
+    let markers = [];
+
     const map = new maplibregl.Map({
       container: "map",
       style: {
@@ -58,9 +70,25 @@
           { id: "seamark-layer", type: "raster", source: "openseamap" }
         ]
       },
-      center: [82.5, 17.5],
-      zoom: 5.5
+      center: [83.5, 19.5],
+      zoom: 5.0
     });
+
+    function upsertLineLayer(sourceId, layerId, geojson, color, dashArray = null) {
+      if (map.getSource(sourceId)) {
+        map.getSource(sourceId).setData(geojson);
+      } else {
+        map.addSource(sourceId, { type: "geojson", data: geojson });
+        const paint = { "line-color": color, "line-width": 4 };
+        if (dashArray) paint["line-dasharray"] = dashArray;
+        map.addLayer({ id: layerId, type: "line", source: sourceId, paint });
+      }
+    }
+
+    function clearLayer(sourceId, layerId) {
+      if (map.getLayer(layerId)) map.removeLayer(layerId);
+      if (map.getSource(sourceId)) map.removeSource(sourceId);
+    }
 
     async function init() {
       const res = await fetch(`${API_BASE}/api/hubs`);
@@ -71,8 +99,8 @@
         originSel.add(new Option(`${h.name} (${h.state})`, h.id));
         destSel.add(new Option(`${h.name} (${h.state})`, h.id));
       });
-      originSel.value = "INMAP"; // Machilipatnam
-      destSel.value = "INVTZ";   // Visakhapatnam
+      originSel.value = "INPAT-NW1"; // Gaighat Terminal (Patna - NW-1)
+      destSel.value = "INHAL";       // Haldia Dock Complex
     }
 
     async function calculateRoutes() {
@@ -82,16 +110,38 @@
       const res = await fetch(`${API_BASE}/api/compare?origin_id=${origin}&dest_id=${dest}&cargo_tonnes=${tonnes}`);
       const data = await res.json();
 
+      // Update origin & destination pins
+      markers.forEach(m => m.remove());
+      markers = [
+        new maplibregl.Marker({ color: "#10b981" })
+          .setLngLat(data.origin.coords)
+          .setPopup(new maplibregl.Popup().setText(`Origin: ${data.origin.name}`))
+          .addTo(map),
+        new maplibregl.Marker({ color: "#ef4444" })
+          .setLngLat(data.destination.coords)
+          .setPopup(new maplibregl.Popup().setText(`Destination: ${data.destination.name}`))
+          .addTo(map)
+      ];
+
+      clearLayer("sea-route", "sea-route-line");
+      clearLayer("iw-route", "iw-route-line");
+
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = "";
+      let allCoords = [data.origin.coords, data.destination.coords];
 
       data.options.forEach(opt => {
+        let extraMeta = "";
+        if (opt.min_lad_meters) {
+          extraMeta += `<br/>Channel LAD: <b>${opt.min_lad_meters}m</b> (${opt.waterway_name})`;
+        }
         let weatherHtml = "";
         if (opt.marine_weather) {
           const w = opt.marine_weather;
           weatherHtml = `<div class="badge">🌊 Wave: ${w.wave_height_m ?? "N/A"}m | 💨 Wind: ${w.wind_speed_kmh ?? "N/A"} km/h | Risk: ${w.weather_risk}</div>`;
         }
         const extraDist = opt.distance_nm ? ` (${opt.distance_nm} NM)` : "";
+
         resultsDiv.innerHTML += `
           <div class="card ${opt.mode}">
             <h3>${opt.label}</h3>
@@ -99,27 +149,23 @@
               Distance: <b>${opt.distance_km} km${extraDist}</b><br/>
               Est. Transit Time: <b>${opt.estimated_hours} hrs</b><br/>
               Est. Freight Cost: <b>₹${opt.estimated_cost_inr.toLocaleString("en-IN")}</b>
+              ${extraMeta}
             </div>
             ${weatherHtml}
           </div>`;
 
         if (opt.mode === "coastal_sea") {
-          if (map.getSource("sea-route")) {
-            map.getSource("sea-route").setData(opt.geometry);
-          } else {
-            map.addSource("sea-route", { type: "geojson", data: opt.geometry });
-            map.addLayer({
-              id: "sea-route-line",
-              type: "line",
-              source: "sea-route",
-              paint: { "line-color": "#0284c7", "line-width": 4 }
-            });
-          }
-          const coords = opt.geometry.coordinates;
-          const bounds = coords.reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(coords[0], coords[0]));
-          map.fitBounds(bounds, { padding: 60 });
+          upsertLineLayer("sea-route", "sea-route-line", opt.geometry, "#0284c7");
+          allCoords = allCoords.concat(opt.geometry.coordinates);
+        }
+        if (opt.mode === "inland_waterway") {
+          upsertLineLayer("iw-route", "iw-route-line", opt.geometry, "#14b8a6", [2, 1]);
+          allCoords = allCoords.concat(opt.geometry.coordinates);
         }
       });
+
+      const bounds = allCoords.reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(allCoords, allCoords));
+      map.fitBounds(bounds, { padding: 70 });
     }
 
     init();
